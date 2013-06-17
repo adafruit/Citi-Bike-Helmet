@@ -371,11 +371,6 @@ int counter = 0;
 // off by default!
 boolean usingInterrupt = false;
 
-// Trip distance
-float tripDistance;
-
-boolean isStarted = false;
-
 void setup()  
 {
   // connect at 115200 so we can read the GPS fast enough and echo without dropping chars
@@ -385,7 +380,8 @@ void setup()
   
   Serial.println("initialize");
   //test to find the closest location from the list, just plug in a lat lon from the above Array
-  Serial.println(find_closest_location(40.765908, -73.976342));
+  //Serial.print("Closest Test Loc: ");
+  //Serial.println(find_closest_location(40.719571, -74.006596));
 
   Wire.begin();
   // 9600 NMEA is the default baud rate for Adafruit MTK GPS's- some use 4800
@@ -457,7 +453,7 @@ void loop()                     // run over and over again
     //Serial.print("Fix: "); Serial.print((int)GPS.fix);
     //Serial.print(" quality: "); Serial.println((int)GPS.fixquality); 
     if (GPS.fix) {
-      //Serial.print("GPS FIX");
+      Serial.print("GPS FIX");
       //Serial.print("Location: ");
       //Serial.print(GPS.latitude, 2); Serial.print(GPS.lat);
       //Serial.print(", "); 
@@ -468,12 +464,7 @@ void loop()                     // run over and over again
       
       int closest_loc = find_closest_location(fLat, fLon);
       float targetLat = pgm_read_float(&lat_lon[closest_loc][0]);
-      float targetLon = pgm_read_float(&lat_lon[closest_loc][1]);         
-      
-      if (!isStarted) {
-        isStarted = true;
-        tripDistance = (double)calc_dist(fLat, fLon, targetLat, targetLon);
-      }
+      float targetLon = pgm_read_float(&lat_lon[closest_loc][1]);
       
       //Serial.print("Speed (knots): "); Serial.println(GPS.speed);
       //Serial.print("Angle: "); Serial.println(GPS.angle);
@@ -481,6 +472,7 @@ void loop()                     // run over and over again
       //Serial.print("Satellites: "); Serial.println((int)GPS.satellites);
       compass.read();
       int heading = compass.heading((LSM303::vector){0,-1,0});
+      Serial.print("Heading: ");
       Serial.println(heading);
       if ((calc_bearing(fLat, fLon, targetLat, targetLon) - heading) > 0) {
         headingDirection(calc_bearing(fLat, fLon, targetLat, targetLon)-heading);
@@ -614,40 +606,6 @@ void headingDirection(float heading)
   }
 }
 
-/*
-void headingDistance(float fDist)
-{
-  //Use this part of the code to determine how far you are away from the destination.
-  //The total trip distance (from where you started) is divided into five trip segments.
-  float tripSegment = tripDistance/5;
-  
-  if (fDist >= (tripSegment*4)) {
-    Serial.println("Trip Distance: 5");
-  }
-  
-  if ((fDist >= (tripSegment*3))&&(fDist < (tripSegment*4))) {
-    Serial.println("Trip Distance: 4");
-  }
-  
-  if ((fDist >= (tripSegment*2))&&(fDist < (tripSegment*3))) {
-    Serial.println("Trip Distance: 3");
-  }
-  
-  if ((fDist >= tripSegment)&&(fDist < (tripSegment*2))) {
-    Serial.println("Trip Distance: 2");
-  }
-  
-  if ((fDist >= 5)&&(fDist < tripSegment)) {
-    Serial.println("Trip Distance: 1");
-  }
-  
-  if ((fDist < 5)) { // You are now within 5 meters of your destination.
-    Serial.println("Trip Distance: 0");
-    //Serial.println("Arrived at destination!");
-  }
-}
-*/
-
 unsigned long calc_dist(float flat1, float flon1, float flat2, float flon2)
 {
   float dist_calc=0;
@@ -684,11 +642,26 @@ int find_closest_location(float current_lat, float current_lon)
     float target_lon = pgm_read_float(&lat_lon[i][1]);
 
     tempDistance = calc_dist(current_lat, current_lon, target_lat, target_lon);
-    if ((minDistance > tempDistance) ||  minDistance == -1) {
+    /*
+    Serial.print("current_lat: ");
+    Serial.println(current_lat, 6);
+    Serial.print("current_lon: ");
+    Serial.println(current_lon, 6); 
+    Serial.print("target_lat: ");
+    Serial.println(target_lat, 6);
+    Serial.print("target_lon: ");
+    Serial.println(target_lon, 6);  
+    
+    Serial.print("tempDistance: ");
+    Serial.println(tempDistance);
+    Serial.print("Array Loc: ");
+    Serial.println(i); 
+    */
+    
+    if ((minDistance > tempDistance) || (minDistance == -1)) {
       minDistance = tempDistance;
       closest = i;
-      Serial.println(minDistance);
-      Serial.println(i);
+
     }
  
   }
