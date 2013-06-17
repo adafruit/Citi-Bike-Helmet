@@ -7,12 +7,15 @@
 var request = require('request');
 request('http://api.citybik.es/citibikenyc.json', function (error, response, body) {
   if (!error && response.statusCode == 200) {
+    var comma = ",";
     var locations = JSON.parse(body);
-    locations.forEach(function(l) {
-      console.log("  {" + (l.lat / 1000000).toFixed(6) + ", " + (l.lng / 1000000).toFixed(6) + "},");
-      count++;
+    locations.forEach(function(l, i) {
+      if (i === locations.length-1)
+        comma = "";
+
+      console.log("  {" + (l.lat / 1000000).toFixed(6) + ", " + (l.lng / 1000000).toFixed(6) + "}" + comma);
     });
 
     console.log(locations.length);
   }
-})
+});
