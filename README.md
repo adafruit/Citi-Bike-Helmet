@@ -1,7 +1,9 @@
-# This repo has been archived
+## This repo has been archived
 
 You can find the latest version of this code at it's new home at 
 https://github.com/adafruit/Adafruit_Learning_System_Guides/tree/master/Flora_Citi_Bike_Helmet
+
+------------------------------------
 
 The Citi Bike Helmet is a project created by Becky Stern, Tyler Cooper and Justin Cooper.  For more details on the project, please visit http://learn.adafruit.com/citi-bike-helmet/.
 
